@@ -19,4 +19,6 @@ interface INftStore {
         NFTVoucher memory data,
         bytes calldata signature
     ) external payable;
+
+    function withdrawPayments() external;
 }

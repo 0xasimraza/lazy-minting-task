@@ -40,7 +40,7 @@ contract NftStore is ERC721URIStorage, EIP712, INftStore {
         emit RedeemVoucher(_claimer, message, block.timestamp);
     }
 
-    function withdrawPayments() external {
+    function withdrawPayments() external override {
         if (ethTobeWithdraw <= 0) {
             revert InsufficientBalance();
         }
