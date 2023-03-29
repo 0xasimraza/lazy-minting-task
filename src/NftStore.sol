@@ -26,6 +26,9 @@ contract NftStore is ERC721URIStorage, EIP712, INftStore {
         NFTVoucher memory message,
         bytes calldata signature
     ) external payable override {
+        if (_exists(message.tokenId)) {
+            revert TokenIdAlreadyExist();
+        }
         if (msg.value < message.price) {
             revert InsufficientBalance();
         }
@@ -59,9 +62,9 @@ contract NftStore is ERC721URIStorage, EIP712, INftStore {
     ) internal view {
         bytes32 signedMessageHash = keccak256(abi.encode(message))
             .toEthSignedMessageHash();
-        require(
-            signedMessageHash.recover(signature) == signer,
-            "signature not valid"
-        );
+
+        if (signedMessageHash.recover(signature) != signer) {
+            revert SignatureNotValid();
+        }
     }
 }

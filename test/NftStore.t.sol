@@ -43,7 +43,7 @@ contract NftStoreTest is Test {
         INftStore.NFTVoucher memory message = INftStore.NFTVoucher({
             tokenId: 0,
             price: 10,
-            tokenUri: "xyz/1"
+            tokenUri: "xyz.com/1"
         });
 
         bytes32 msgHash = keccak256(abi.encode(message))
@@ -75,7 +75,31 @@ contract NftStoreTest is Test {
         assertEq(signature.length, 65);
 
         t.reedemVoucher{value: 10 wei}(other, message, signature);
-        assertEq(t.ownerOf(message.tokenId), other, "Not the owner");
+        assertEq(t.ownerOf(message.tokenId), other, "Owner not matched");
+    }
+
+    function testReMintSameIdbyAnyone() public {
+        vm.startPrank(other);
+        vm.deal(other, 1 ether);
+
+        INftStore.NFTVoucher memory message = INftStore.NFTVoucher({
+            tokenId: 0,
+            price: 10,
+            tokenUri: "xyz.com/1"
+        });
+
+        bytes32 msgHash = keccak256(abi.encode(message))
+            .toEthSignedMessageHash();
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(privateKey, msgHash);
+
+        bytes memory signature = abi.encodePacked(r, s, v);
+        assertEq(signature.length, 65);
+
+        t.reedemVoucher{value: 10 wei}(other, message, signature);
+
+        bytes4 selector = bytes4(keccak256("TokenIdAlreadyExist()"));
+        vm.expectRevert(abi.encodeWithSelector(selector));
+        t.reedemVoucher{value: 10 wei}(other, message, signature);
     }
 
     function testWithdrawAmountBySigner() public {
@@ -85,7 +109,7 @@ contract NftStoreTest is Test {
         INftStore.NFTVoucher memory message = INftStore.NFTVoucher({
             tokenId: 0,
             price: 10,
-            tokenUri: "xyz/1"
+            tokenUri: "xyz.com/1"
         });
 
         bytes32 msgHash = keccak256(abi.encode(message))
@@ -99,8 +123,8 @@ contract NftStoreTest is Test {
 
         t.withdrawPayments();
 
-        assertEq(address(signer).balance, 1 ether, "Not received");
-        assertEq(address(t).balance, 0, "Amount remaining");
+        assertEq(address(signer).balance, 1 ether, "Eth not received");
+        assertEq(address(t).balance, 0, "Amount remaining in contract");
     }
 
     function testWithdrawAmountByAnyone() public {
@@ -135,5 +159,76 @@ contract NftStoreTest is Test {
         bytes4 selector = bytes4(keccak256("InsufficientBalance()"));
         vm.expectRevert(abi.encodeWithSelector(selector));
         t.withdrawPayments();
+    }
+
+    function testMintNftWithInvalidSignature() public {
+        vm.startPrank(other);
+        vm.deal(other, 1 ether);
+
+        INftStore.NFTVoucher memory message = INftStore.NFTVoucher({
+            tokenId: 0,
+            price: 10,
+            tokenUri: "xyz.com/1"
+        });
+
+        bytes32 msgHash = keccak256(abi.encode(message))
+            .toEthSignedMessageHash();
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(privateKey, msgHash);
+
+        bytes memory signature = abi.encodePacked(r, s, v);
+        assertEq(signature.length, 65);
+
+        bytes4 selector = bytes4(keccak256("SignatureNotValid()"));
+        vm.expectRevert(abi.encodeWithSelector(selector));
+        t.reedemVoucher{value: 10 wei}(
+            other,
+            INftStore.NFTVoucher({
+                tokenId: 1,
+                price: 10,
+                tokenUri: "xyz.com/1"
+            }),
+            signature
+        );
+    }
+
+    function testNftMintsbySignerAndAnyone() public {
+        vm.startPrank(signer);
+        vm.deal(signer, 1 ether);
+
+        INftStore.NFTVoucher memory message1 = INftStore.NFTVoucher({
+            tokenId: 0,
+            price: 10,
+            tokenUri: "xyz.com/1"
+        });
+
+        bytes32 msgHash1 = keccak256(abi.encode(message1))
+            .toEthSignedMessageHash();
+        (uint8 v1, bytes32 r1, bytes32 s1) = vm.sign(privateKey, msgHash1);
+
+        bytes memory signature1 = abi.encodePacked(r1, s1, v1);
+        assertEq(signature1.length, 65);
+
+        t.reedemVoucher{value: 10 wei}(signer, message1, signature1);
+        assertEq(t.ownerOf(message1.tokenId), signer, "Owner not matched");
+        vm.stopPrank();
+
+        vm.startPrank(other);
+        vm.deal(other, 1 ether);
+
+        INftStore.NFTVoucher memory message2 = INftStore.NFTVoucher({
+            tokenId: 1,
+            price: 50,
+            tokenUri: "xyz.com/2"
+        });
+
+        bytes32 msgHash2 = keccak256(abi.encode(message2))
+            .toEthSignedMessageHash();
+        (uint8 v2, bytes32 r2, bytes32 s2) = vm.sign(privateKey, msgHash2);
+
+        bytes memory signature2 = abi.encodePacked(r2, s2, v2);
+        assertEq(signature2.length, 65);
+
+        t.reedemVoucher{value: 50 wei}(other, message2, signature2);
+        assertEq(t.ownerOf(message2.tokenId), other, "Owner not matched");
     }
 }

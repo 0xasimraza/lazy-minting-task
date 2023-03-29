@@ -4,6 +4,8 @@ pragma solidity ^0.8.13;
 interface INftStore {
     error InsufficientBalance();
     error UnAuthorized();
+    error TokenIdAlreadyExist();
+    error SignatureNotValid();
 
     event RedeemVoucher(address claimer, NFTVoucher nft, uint256 timestamp);
     event PaymentWithdrawn(address signer, uint256 amount, uint256 timestamp);
