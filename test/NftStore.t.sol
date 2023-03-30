@@ -292,5 +292,9 @@ contract NftStoreTest is Test {
             uint256 _vouchersDistributed,
             uint256 _ethTobeWithdraw
         ) = t.getContractStates();
+
+        console.log("_signer: ", _signer);
+        console.log("_vouchersDistributed: ", _vouchersDistributed);
+        console.log("_ethTobeWithdraw: ", _ethTobeWithdraw);
     }
 }
