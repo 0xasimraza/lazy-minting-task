@@ -13,7 +13,7 @@ interface INftStore {
     struct NFTVoucher {
         uint256 tokenId;
         uint256 price;
-        string tokenUri;
+        string metadataUri;
     }
 
     function reedemVoucher(
@@ -23,4 +23,9 @@ interface INftStore {
     ) external payable;
 
     function withdrawPayments() external;
+
+    function getContractStates()
+        external
+        view
+        returns (address, uint256, uint256);
 }
