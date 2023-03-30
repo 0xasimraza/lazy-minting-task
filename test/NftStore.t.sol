@@ -111,7 +111,7 @@ contract NftStoreTest is Test {
         assertEq(t.ownerOf(message.tokenId), other, "Owner not matched");
     }
 
-    function testReMintSameIdbyAnyone() public {
+    function testRevertTokenIdAlreadyExistOnReMintID() public {
         vm.startPrank(other);
         vm.deal(other, 1 ether);
 
@@ -160,7 +160,7 @@ contract NftStoreTest is Test {
         assertEq(address(t).balance, 0, "Amount remaining in contract");
     }
 
-    function testWithdrawAmountByAnyone() public {
+    function testWithdrawPaymentsRevertUnAuthorized() public {
         vm.startPrank(signer);
         vm.deal(signer, 1 ether);
 
@@ -186,7 +186,7 @@ contract NftStoreTest is Test {
         t.withdrawPayments();
     }
 
-    function testWithdrawZeroAmountBySigner() public {
+    function testWithdrawPaymentsRevertInsufficientBalance() public {
         vm.startPrank(signer);
 
         bytes4 selector = bytes4(keccak256("InsufficientBalance()"));
@@ -194,7 +194,7 @@ contract NftStoreTest is Test {
         t.withdrawPayments();
     }
 
-    function testMintNftWithInvalidSignature() public {
+    function testShouldRevertSignatureNotValid() public {
         vm.startPrank(other);
         vm.deal(other, 1 ether);
 
