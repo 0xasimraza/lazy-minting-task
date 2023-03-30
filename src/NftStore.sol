@@ -67,6 +67,7 @@ contract NftStore is ERC721URIStorage, INftStore {
         emit PaymentWithdrawn(signer, pendingAmount, block.timestamp);
     }
 
+    /// @inheritdoc INftStore
     function transferGovernance(address _signer) external override {
         if (msg.sender != signer) {
             revert UnAuthorized();

@@ -35,6 +35,9 @@ interface INftStore {
     /// @notice withdraw payments can do by NFT Creator (signer in our case)
     function withdrawPayments() external;
 
+    /// @notice use for transfer ownership of governance
+    /// @notice transfer ownership can do by NFT Creator (signer in our case)
+    /// @param _signer new signer address
     function transferGovernance(address _signer) external;
 
     /// @notice use to read contract states
