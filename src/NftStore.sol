@@ -5,9 +5,8 @@ import "./INftStore.sol";
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 
-contract NftStore is ERC721URIStorage, EIP712, INftStore {
+contract NftStore is ERC721URIStorage, INftStore {
     using ECDSA for bytes32;
 
     address public immutable signer;
@@ -15,9 +14,7 @@ contract NftStore is ERC721URIStorage, EIP712, INftStore {
     uint256 vouchersDistributed;
     uint256 ethTobeWithdraw;
 
-    constructor(
-        address _signer
-    ) ERC721("NFT Store", "NFT") EIP712("NFT Store", "1") {
+    constructor(address _signer) ERC721("NFT Store", "NFT") {
         signer = _signer;
     }
 
