@@ -12,8 +12,6 @@ import "forge-std/console.sol";
 contract NftStoreTest is Test {
     using ECDSA for bytes32;
     string[] private userLabels;
-    // address payable internal user1;
-    // address payable internal user2;
     address payable internal other;
 
     address signer;
@@ -23,8 +21,6 @@ contract NftStoreTest is Test {
 
     function setUp() public {
         userLabels = new string[](2);
-        // userLabels.push("user1");
-        // userLabels.push("user2");
         userLabels.push("other");
 
         signer = vm.addr(privateKey);
