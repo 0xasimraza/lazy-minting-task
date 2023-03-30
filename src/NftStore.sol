@@ -25,29 +25,29 @@ contract NftStore is ERC721URIStorage, INftStore {
     /// @inheritdoc INftStore
     function reedemVoucher(
         address _claimer,
-        NFTVoucher memory message,
-        bytes calldata signature
+        NFTVoucher memory _data,
+        bytes calldata _signature
     ) external payable override {
-        if (_exists(message.tokenId)) {
+        if (_exists(_data.tokenId)) {
             revert TokenIdAlreadyExist();
         }
 
-        if (msg.value < message.price) {
+        if (msg.value < _data.price) {
             revert InsufficientBalance();
         }
 
-        _recSig(message, signature);
+        _recSig(_data, _signature);
 
         ethTobeWithdraw += msg.value;
 
-        _mint(_claimer, message.tokenId);
-        _setTokenURI(message.tokenId, message.metadataUri);
+        _mint(_claimer, _data.tokenId);
+        _setTokenURI(_data.tokenId, _data.metadataUri);
 
         unchecked {
             vouchersDistributed++;
         }
 
-        emit RedeemVoucher(_claimer, message, block.timestamp);
+        emit RedeemVoucher(_claimer, _data, block.timestamp);
     }
 
     /// @inheritdoc INftStore
@@ -87,13 +87,13 @@ contract NftStore is ERC721URIStorage, INftStore {
     }
 
     function _recSig(
-        NFTVoucher memory message,
-        bytes calldata signature
+        NFTVoucher memory _message,
+        bytes calldata _signature
     ) internal view {
-        bytes32 signedMessageHash = keccak256(abi.encode(message))
+        bytes32 signedMessageHash = keccak256(abi.encode(_message))
             .toEthSignedMessageHash();
 
-        if (signedMessageHash.recover(signature) != signer) {
+        if (signedMessageHash.recover(_signature) != signer) {
             revert SignatureNotValid();
         }
     }

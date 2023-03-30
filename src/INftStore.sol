@@ -22,13 +22,13 @@ interface INftStore {
     }
 
     /// @notice use for redeem voucher
-    /// @param claimer The user address who wants to redeem voucher
-    /// @param data NFTVoucher struct which contains details of NFT voucher
-    /// @param signature signature of NFT creator
+    /// @param _claimer The user address who wants to redeem voucher
+    /// @param _data NFTVoucher struct which contains details of NFT voucher
+    /// @param _signature signature of NFT creator
     function reedemVoucher(
-        address claimer,
-        NFTVoucher memory data,
-        bytes calldata signature
+        address _claimer,
+        NFTVoucher memory _data,
+        bytes calldata _signature
     ) external payable;
 
     /// @notice use for withdraw Eth amount
