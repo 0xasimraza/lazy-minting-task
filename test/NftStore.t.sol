@@ -293,4 +293,13 @@ contract NftStoreTest is Test {
         console.log("_vouchersDistributed: ", _vouchersDistributed);
         console.log("_ethTobeWithdraw: ", _ethTobeWithdraw);
     }
+
+    function testTransferGovernance() public {
+        vm.startPrank(signer);
+        t.transferGovernance(other);
+
+        (address _signer, , ) = t.getContractStates();
+
+        assertEq(_signer, other, "Owner not matched");
+    }
 }

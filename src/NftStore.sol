@@ -6,10 +6,14 @@ import "./INftStore.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
+/// @title Task of Lazy Minting
+/// @author Asim Raza
+/// @notice You can use this contract for only redeem voucher
+/// @dev All function calls are currently implemented without side effects
 contract NftStore is ERC721URIStorage, INftStore {
     using ECDSA for bytes32;
 
-    address public immutable signer;
+    address signer;
 
     uint256 vouchersDistributed;
     uint256 ethTobeWithdraw;
@@ -18,6 +22,7 @@ contract NftStore is ERC721URIStorage, INftStore {
         signer = _signer;
     }
 
+    /// @inheritdoc INftStore
     function reedemVoucher(
         address _claimer,
         NFTVoucher memory message,
@@ -45,6 +50,7 @@ contract NftStore is ERC721URIStorage, INftStore {
         emit RedeemVoucher(_claimer, message, block.timestamp);
     }
 
+    /// @inheritdoc INftStore
     function withdrawPayments() external override {
         if (msg.sender != signer) {
             revert UnAuthorized();
@@ -55,14 +61,21 @@ contract NftStore is ERC721URIStorage, INftStore {
         }
 
         uint256 pendingAmount = ethTobeWithdraw;
-
         ethTobeWithdraw = 0;
-
         payable(msg.sender).transfer(pendingAmount);
 
         emit PaymentWithdrawn(signer, pendingAmount, block.timestamp);
     }
 
+    function transferGovernance(address _signer) external override {
+        if (msg.sender != signer) {
+            revert UnAuthorized();
+        }
+
+        emit GovernanceUpdated(signer, signer = _signer, block.timestamp);
+    }
+
+    /// @inheritdoc INftStore
     function getContractStates()
         external
         view
